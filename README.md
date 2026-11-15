@@ -1,1 +1,17 @@
-# beat-music
+# BeatBox Music Room – Theme 9: Instrument loans
+
+Express + SQLite API for a team of **5 members**, with one folder per member. Each folder runs on its own (`npm install`, then `npm start`) and builds on the one before it.
+
+Part 6 (Postman and README) is shared: each member has a Postman collection for their own part and wrote their section of the final README.
+
+| Folder | Member | Part | Their Postman file |
+|---|---|---|---|
+| `member1-server-and-routes` | Member 1 | Express setup, routers, status codes (in-memory data) | `member1-server.postman_collection.json` |
+| `member2-database` | Member 2 | `db.js`: 3 SQLite tables, foreign keys, sample data, queries | `member2-database.postman_collection.json` |
+| `member3-rest-endpoints` | Member 3 | Instrument CRUD + `GET /loans` join | `member3-rest.postman_collection.json` |
+| `member4-validation-and-search` | Member 4 | `validation.js`, clear errors, `?family=` search | `member4-validation.postman_collection.json` |
+| `member5-twist-pagination` | Member 5 | `page` / `limit` twist + `npm test`, and **puts the final project together** | `member5-twist.postman_collection.json` |
+
+**Hand in:** push `member5-twist-pagination` to GitHub. It has the complete code, the full README and the combined `BeatBox.postman_collection.json` (all members' tests together).
+
+Needs Node.js 18+.
