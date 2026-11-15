@@ -1,0 +1,13 @@
+{
+  "name": "beatbox-music-room-server",
+  "version": "1.0.0",
+  "description": "BeatBox Music Room - part 1: Express server, routes and status codes",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
