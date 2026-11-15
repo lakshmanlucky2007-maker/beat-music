@@ -1,0 +1,233 @@
+{
+  "info": {
+    "name": "Member 5 - Twist: pages of results",
+    "description": "The 3 twist tests from the brief plus extras. Start the server on a fresh database (delete beatbox.db) before running.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "page1Ids",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Test 1: page=1&limit=2 -> 200, 2 instruments",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"total, page 1, 2 items\", () => { const b = pm.response.json(); pm.expect(b).to.have.property('total'); pm.expect(b.page).to.eql(1); pm.expect(b.data.length).to.eql(2); pm.collectionVariables.set('page1Ids', JSON.stringify(b.data.map(i => i.id))); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments?page=1&limit=2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "2"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test 2: page=2&limit=2 -> 200, the next 2",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"page 2, next 2 items\", () => { const b = pm.response.json(); pm.expect(b.page).to.eql(2); pm.expect(b.data.length).to.eql(2); const prev = JSON.parse(pm.collectionVariables.get('page1Ids') || '[]'); b.data.forEach(i => pm.expect(prev).to.not.include(i.id)); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments?page=2&limit=2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "2"
+            },
+            {
+              "key": "limit",
+              "value": "2"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Test 3: page=0 -> 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments?page=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Negative limit -> 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+              "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments?limit=-1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ],
+          "query": [
+            {
+              "key": "limit",
+              "value": "-1"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Defaults page 1, limit 5",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Defaults\", () => { const b = pm.response.json(); pm.expect(b.page).to.eql(1); pm.expect(b.limit).to.eql(5); pm.expect(b.data.length).to.eql(5); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Pages + search together",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Total is strings only\", () => { const b = pm.response.json(); pm.expect(b.total).to.eql(3); pm.expect(b.data.length).to.eql(2); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments?family=strings&page=1&limit=2",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ],
+          "query": [
+            {
+              "key": "family",
+              "value": "strings"
+            },
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "limit",
+              "value": "2"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

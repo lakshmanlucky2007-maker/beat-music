@@ -1,0 +1,952 @@
+{
+  "info": {
+    "name": "BeatBox Music Room API",
+    "description": "Theme 9 - Instrument loans. Run the whole collection with the Collection Runner (server must be running on a fresh database: delete beatbox.db first).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "newInstrumentId",
+      "value": ""
+    },
+    {
+      "key": "newMusicianId",
+      "value": ""
+    },
+    {
+      "key": "newLoanId",
+      "value": ""
+    },
+    {
+      "key": "page1Ids",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Twist - Pages of results",
+      "item": [
+        {
+          "name": "Test 1: page=1&limit=2 -> 200, 2 instruments",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Has total, page and data\", () => { pm.expect(b).to.have.property(\"total\"); pm.expect(b.page).to.eql(1); });",
+                  "pm.test(\"Returns 2 instruments\", () => pm.expect(b.data.length).to.eql(2));",
+                  "pm.collectionVariables.set(\"page1Ids\", JSON.stringify(b.data.map(i => i.id)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments?page=1&limit=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Test 2: page=2&limit=2 -> 200, the next 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Page is 2 with 2 instruments\", () => { pm.expect(b.page).to.eql(2); pm.expect(b.data.length).to.eql(2); });",
+                  "const prev = JSON.parse(pm.collectionVariables.get(\"page1Ids\") || \"[]\");",
+                  "pm.test(\"Different from page 1\", () => b.data.forEach(i => pm.expect(prev).to.not.include(i.id)));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments?page=2&limit=2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                },
+                {
+                  "key": "limit",
+                  "value": "2"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Test 3: page=0 -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments?page=0",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Negative limit -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments?limit=-1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "-1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Defaults page 1, limit 5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Defaults are 1 and 5\", () => { pm.expect(b.page).to.eql(1); pm.expect(b.limit).to.eql(5); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Instruments CRUD",
+      "item": [
+        {
+          "name": "Add instrument -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Has id, name, family\", () => { pm.expect(b.id).to.be.a(\"number\"); pm.expect(b.name).to.eql(\"Sitar\"); pm.expect(b.family).to.eql(\"strings\"); });",
+                  "pm.collectionVariables.set(\"newInstrumentId\", b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/instruments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sitar\",\n  \"family\": \"strings\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get one instrument -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/{{newInstrumentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "{{newInstrumentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update instrument -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Name updated\", () => pm.expect(pm.response.json().name).to.eql(\"Electric Sitar\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/{{newInstrumentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "{{newInstrumentId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electric Sitar\",\n  \"family\": \"strings\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete instrument -> 204",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 204\", () => pm.response.to.have.status(204));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/{{newInstrumentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "{{newInstrumentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get deleted instrument -> 404",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/{{newInstrumentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "{{newInstrumentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete instrument with loans -> 409",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/1",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "1"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Validation and search",
+      "item": [
+        {
+          "name": "Add with empty name -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/instruments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"family\": \"strings\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Add with wrong family -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/instruments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Electric Guitar\",\n  \"family\": \"rock\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update with missing family -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/2",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "2"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Cello\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Get with bad id -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments/abc",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments",
+                "abc"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search family=strings -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Only strings\", () => pm.response.json().data.forEach(i => pm.expect(i.family).to.eql(\"strings\")));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments?family=strings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ],
+              "query": [
+                {
+                  "key": "family",
+                  "value": "strings"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search unknown family -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/instruments?family=rock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "instruments"
+              ],
+              "query": [
+                {
+                  "key": "family",
+                  "value": "rock"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Musicians and loans (join)",
+      "item": [
+        {
+          "name": "All musicians -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/musicians",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "musicians"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add musician -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "pm.collectionVariables.set(\"newMusicianId\", pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/musicians",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "musicians"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Divya Nair\",\n  \"class_name\": \"9A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Add musician without name -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/musicians",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "musicians"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"class_name\": \"9A\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Loans with names (JOIN) -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Each loan has musician_name and instrument_name\", () => pm.response.json().forEach(l => { pm.expect(l).to.have.property(\"musician_name\"); pm.expect(l).to.have.property(\"instrument_name\"); }));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "loans"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Borrow Flute -> 201",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 201\", () => pm.response.to.have.status(201));",
+                  "const b = pm.response.json();",
+                  "pm.test(\"Shows names\", () => { pm.expect(b.instrument_name).to.eql(\"Flute\"); });",
+                  "pm.collectionVariables.set(\"newLoanId\", b.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "loans"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"musician_id\": \"{{newMusicianId}}\",\n  \"instrument_id\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Borrow Flute again -> 409 (already out)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 409\", () => pm.response.to.have.status(409));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "loans"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"musician_id\": 1,\n  \"instrument_id\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Return Flute -> 200",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+                  "pm.test(\"Has return date\", () => pm.expect(pm.response.json().return_date).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/loans/{{newLoanId}}/return",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "loans",
+                "{{newLoanId}}",
+                "return"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Loan with bad ids -> 400",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status is 400\", () => pm.response.to.have.status(400));",
+                  "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/loans",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "loans"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"musician_id\": \"x\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
