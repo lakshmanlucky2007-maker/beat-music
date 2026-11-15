@@ -1,0 +1,214 @@
+{
+  "info": {
+    "name": "Member 2 - Database",
+    "description": "Tables, sample data and queries. Start the server on a fresh database (delete beatbox.db) before running.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Schema shows 3 tables -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Has musicians, instruments, loans\", () => { const b = pm.response.json(); pm.expect(b).to.have.all.keys('musicians','instruments','loans'); });",
+              "pm.test(\"loans has foreign key columns\", () => { const b = pm.response.json(); pm.expect(b.loans.join()).to.include('musician_id').and.include('instrument_id'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/schema",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "schema"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Musicians from DB -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"3 sample musicians\", () => { const b = pm.response.json(); pm.expect(b.length).to.eql(3); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/musicians",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "musicians"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Instruments from DB -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"8 sample instruments\", () => { const b = pm.response.json(); pm.expect(b.length).to.eql(8); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Loans from DB -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Rows have ids of musician and instrument\", () => { const b = pm.response.json(); pm.expect(b[0]).to.have.property('musician_id'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/loans",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "loans"
+          ]
+        }
+      }
+    },
+    {
+      "name": "One instrument -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));",
+              "pm.test(\"Is the Violin\", () => { const b = pm.response.json(); pm.expect(b.name).to.eql('Violin'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "One musician -> 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 200\", () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/musicians/1",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "musicians",
+            "1"
+          ]
+        }
+      }
+    },
+    {
+      "name": "Missing instrument -> 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status is 404\", () => pm.response.to.have.status(404));",
+              "pm.test(\"Has a clear error message\", () => pm.expect(pm.response.json().error).to.be.a(\"string\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/instruments/99",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "instruments",
+            "99"
+          ]
+        }
+      }
+    }
+  ]
+}
