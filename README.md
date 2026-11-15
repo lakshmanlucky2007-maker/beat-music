@@ -6,11 +6,11 @@ Part 6 (Postman and README) is shared: each member has a Postman collection for 
 
 | Folder | Member | Part | Their Postman file |
 |---|---|---|---|
-| `member1-server-and-routes` | Member 1 | Express setup, routers, status codes (in-memory data) | `member1-server.postman_collection.json` |
-| `member2-database` | Member 2 | `db.js`: 3 SQLite tables, foreign keys, sample data, queries | `member2-database.postman_collection.json` |
-| `member3-rest-endpoints` | Member 3 | Instrument CRUD + `GET /loans` join | `member3-rest.postman_collection.json` |
+| `srinidhi-server-and-routes` | srinidhi | Express setup, routers, status codes (in-memory data) | `member1-server.postman_collection.json` |
+| `ram-database` | ram | `db.js`: 3 SQLite tables, foreign keys, sample data, queries | `member2-database.postman_collection.json` |
+| `charan-rest-endpoints` | charan reddy | Instrument CRUD + `GET /loans` join | `member3-rest.postman_collection.json` |
 | `lakshman-validation-and-search` | lakshman | `validation.js`, clear errors, `?family=` search | `member4-validation.postman_collection.json` |
-| `member5-twist-pagination` | Member 5 | `page` / `limit` twist + `npm test`, and **puts the final project together** | `member5-twist.postman_collection.json` |
+| `pranitha-twist-pagination` | pranitha | `page` / `limit` twist + `npm test`, and **puts the final project together** | `member5-twist.postman_collection.json` |
 
 **Hand in:** push `member5-twist-pagination` to GitHub. It has the complete code, the full README and the combined `BeatBox.postman_collection.json` (all members' tests together).
 
